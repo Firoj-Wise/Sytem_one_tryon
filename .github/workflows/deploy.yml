@@ -1,18 +1,13 @@
-name: Build and Deploy System One Platform
+name: Build and Deploy to GitHub Pages
 
 on:
   push:
     branches:
       - main
-      - master
-  pull_request:
-    branches:
-      - main
-      - master
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -21,36 +16,12 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
-    name: Build Next.js Frontend
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: Install Dependencies
-        working-directory: ./frontend
-        run: npm ci || npm install
-
-      - name: Build Next.js Application
-        working-directory: ./frontend
-        run: npm run build
-
-  deploy:
-    name: Deploy to GitHub Pages
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-    needs: build
-    runs-on: ubuntu-latest
+  build-and-deploy:
+    name: Build & Deploy Static Site
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -66,18 +37,32 @@ jobs:
         working-directory: ./frontend
         run: npm ci || npm install
 
-      - name: Build Static Export
+      - name: Build Next.js Static Export
         working-directory: ./frontend
-        run: npx next build
+        env:
+          NEXT_EXPORT: "true"
+          GITHUB_ACTIONS: "true"
+        run: |
+          npm run build
+          touch out/.nojekyll
 
-      - name: Setup Pages
+      - name: Deploy to gh-pages branch (Fallback for branch-based Pages)
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./frontend/out
+          publish_branch: gh-pages
+          force_orphan: true
+
+      - name: Setup GitHub Pages (for GitHub Actions Source)
         uses: actions/configure-pages@v4
 
-      - name: Upload Pages Artifact
+      - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./frontend/.next
+          path: ./frontend/out
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
