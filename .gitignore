@@ -44,7 +44,9 @@ wheels/
 *.pem
 *.key
 
-# OS / IDE
+# OS / IDE / Agents
+.agents/
+.claude/
 .DS_Store
 Thumbs.db
 .idea/
