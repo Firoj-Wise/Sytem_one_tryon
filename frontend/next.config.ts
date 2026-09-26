@@ -1,14 +1,15 @@
 import type { NextConfig } from "next";
 
+const isGitHubPages = process.env.GITHUB_ACTIONS === "true" || process.env.NEXT_EXPORT === "true";
+
 const nextConfig: NextConfig = {
-  async rewrites() {
-    return [
-      {
-        source: "/api/:path*",
-        destination: "http://127.0.0.1:8765/api/:path*",
-      },
-    ];
+  output: "export",
+  basePath: isGitHubPages ? "/Sytem_one_tryon" : "",
+  images: {
+    unoptimized: true,
   },
+  trailingSlash: true,
 };
 
 export default nextConfig;
+
