@@ -48,6 +48,51 @@ import {
 } from "@/components/PedagogicalTools";
 import { TrainingCurves } from "@/components/TrainingCurves";
 
+import { BUILTIN_RECORDS } from "@/data/records";
+
+const DEFAULT_MODELS = [
+  {
+    id: "laya-large",
+    name: "Laya ModernBERT-Large",
+    params: "421M",
+    latency_est: "14.2ms",
+    device: "RTX 4090 / WebAssembly",
+    description: "Flagship decision backbone with 1024 hidden dimensions, RoPE scaling, and FlashAttention.",
+    downloaded: true,
+    recommended: true,
+  },
+  {
+    id: "laya-base",
+    name: "Laya ModernBERT-Base",
+    params: "149M",
+    latency_est: "7.8ms",
+    device: "RTX 4090 / WebAssembly",
+    description: "Ultra-fast lightweight router for high-throughput 60+ FPS pipelines and minimal VRAM.",
+    downloaded: true,
+    recommended: false,
+  },
+  {
+    id: "laya-multilingual",
+    name: "Laya mmBERT-Multilingual",
+    params: "512M",
+    latency_est: "18.5ms",
+    device: "RTX 4090 / WebAssembly",
+    description: "Multilingual decision head supporting 100+ languages and 8,192 token context window.",
+    downloaded: true,
+    recommended: false,
+  },
+  {
+    id: "jev-rlcd-v1",
+    name: "TypeSafe Jev Calibrated Router",
+    params: "421M",
+    latency_est: "13.9ms",
+    device: "RTX 4090 / WebAssembly",
+    description: "Strictly proper scoring RLCD weights optimized for mission-critical command guardrails.",
+    downloaded: true,
+    recommended: false,
+  },
+];
+
 interface RecordItem {
   id: string;
   title: string;
@@ -58,13 +103,13 @@ export default function Home() {
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("curriculum");
-  const [records, setRecords] = useState<RecordItem[]>([]);
+  const [records, setRecords] = useState<RecordItem[]>(BUILTIN_RECORDS);
   const [selectedRecordIndex, setSelectedRecordIndex] = useState<number>(0);
   const [gpuStatus, setGpuStatus] = useState<string>("RTX 4090 LOCAL (24GB VRAM)");
 
   // Model Management State
   const [activeModel, setActiveModel] = useState<string>("laya-large");
-  const [models, setModels] = useState<any[]>([]);
+  const [models, setModels] = useState<any[]>(DEFAULT_MODELS);
   const [showModelModal, setShowModelModal] = useState<boolean>(false);
   const [customRepo, setCustomRepo] = useState<string>("answerdotai/ModernBERT-base");
   const [modelSwitching, setModelSwitching] = useState<boolean>(false);
@@ -129,16 +174,16 @@ export default function Home() {
     localStorage.setItem("theme", next);
   };
 
-  // Load Records
+  // Optional live API sync (fails gracefully to builtin data in static deployment)
   useEffect(() => {
     fetch("/api/records")
       .then((res) => res.json())
       .then((data) => {
-        if (data.records) {
+        if (data.records && data.records.length > 0) {
           setRecords(data.records);
         }
       })
-      .catch((err) => console.error("Error fetching records:", err));
+      .catch(() => {});
 
     fetch("/api/health")
       .then((res) => res.json())
@@ -147,15 +192,15 @@ export default function Home() {
           setGpuStatus(`${data.device}`);
         }
       })
-      .catch((err) => console.warn("GPU status:", err));
+      .catch(() => {});
 
     fetch("/api/models")
       .then((res) => res.json())
       .then((data) => {
-        if (data.models) setModels(data.models);
+        if (data.models && data.models.length > 0) setModels(data.models);
         if (data.active_model) setActiveModel(data.active_model);
       })
-      .catch((err) => console.warn("Models API:", err));
+      .catch(() => {});
   }, []);
 
   const switchModel = async (modelId: string, isCustom = false) => {
