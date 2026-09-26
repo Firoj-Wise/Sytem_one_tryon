@@ -1,0 +1,219 @@
+@import "tailwindcss";
+@import "katex/dist/katex.min.css";
+
+/* ── Custom Theme Design Tokens (Dark & Light) ───────────────────────────── */
+:root {
+  /* Default Light Mode (Apple / Linear clean crisp aesthetic) */
+  --page: #f8f9fb;
+  --canvas: #f0f2f5;
+  --surface: #ffffff;
+  --surface-raised: #f3f5f8;
+  --inset: #edf0f5;
+  --hover: #e5e8ef;
+  --hover-2: #dadfe8;
+  --ink: #111317;
+  --ink-2: #4a5160;
+  --ink-3: #757d8f;
+  --line: #d8dce6;
+  --line-strong: #bcc2d1;
+  
+  --accent: #0070f3;
+  --accent-ink: #0056c7;
+  --accent-tint: rgba(0, 112, 243, 0.10);
+  
+  --green: #109a47;
+  --green-ink: #0b7a36;
+  --green-tint: rgba(16, 154, 71, 0.10);
+  
+  --orange: #e66800;
+  --orange-tint: rgba(230, 104, 0, 0.10);
+  
+  --red: #df383e;
+  --red-tint: rgba(223, 56, 62, 0.10);
+  
+  --shadow-hairline: 0 0 0 1px var(--line);
+  --shadow-btn: 0 0 0 1px var(--line-strong), 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-card: 0 0 0 1px var(--line), 0 2px 8px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.02);
+  --shadow-overlay: 0 0 0 1px var(--line-strong), 0 16px 40px rgba(0,0,0,0.12);
+  
+  --radius-sm: 8px;
+  --radius-control: 10px;
+  --radius-card: 14px;
+  
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'Geist Mono', monospace, ui-monospace;
+}
+
+[data-theme="dark"] {
+  /* Obsidian Dark Tech Palette */
+  --page: #0b0c10;
+  --canvas: #111318;
+  --surface: #161922;
+  --surface-raised: #1d212d;
+  --inset: #13151c;
+  --hover: #222634;
+  --hover-2: #2b3142;
+  --ink: #f4f6fa;
+  --ink-2: #9ea5b6;
+  --ink-3: #687082;
+  --line: #252936;
+  --line-strong: #363c4e;
+  
+  --accent: #3d9aff;
+  --accent-ink: #7ec0ff;
+  --accent-tint: rgba(61, 154, 255, 0.14);
+  
+  --green: #3dbb72;
+  --green-ink: #6ee69e;
+  --green-tint: rgba(61, 187, 114, 0.14);
+  
+  --orange: #f68f3c;
+  --orange-tint: rgba(246, 143, 60, 0.14);
+  
+  --red: #ee5c61;
+  --red-tint: rgba(238, 92, 97, 0.14);
+  
+  --shadow-hairline: 0 0 0 1px var(--line);
+  --shadow-btn: 0 0 0 1px var(--line-strong), 0 2px 4px rgba(0,0,0,0.4);
+  --shadow-card: 0 0 0 1px var(--line), 0 3px 12px rgba(0,0,0,0.35);
+  --shadow-overlay: 0 0 0 1px var(--line-strong), 0 16px 44px rgba(0,0,0,0.65);
+}
+
+body {
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* ── Keyframe Animations ────────────────────────────────────────────────── */
+@keyframes fade-up {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pixel-on {
+  0%, 100% { opacity: 0.15; }
+  20%, 45% { opacity: 1; filter: drop-shadow(0 0 3px var(--accent)); }
+  65% { opacity: 0.15; }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+/* ── Senior-Grade Code Syntax Highlighting (Tokyo Night / Vercel Dark) ───── */
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1.25rem 1.5rem;
+  background: var(--inset);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  line-height: 1.7;
+  letter-spacing: -0.01em;
+}
+
+[data-theme="dark"] .hljs-keyword,
+[data-theme="dark"] .hljs-selector-tag,
+[data-theme="dark"] .hljs-subst {
+  color: #c084fc; /* Soft Electric Violet */
+  font-weight: 600;
+}
+[data-theme="light"] .hljs-keyword,
+[data-theme="light"] .hljs-selector-tag,
+[data-theme="light"] .hljs-subst {
+  color: #7c3aed;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .hljs-string,
+[data-theme="dark"] .hljs-addition {
+  color: #6ee7b7; /* Soft Mint / Pistachio */
+}
+[data-theme="light"] .hljs-string,
+[data-theme="light"] .hljs-addition {
+  color: #059669;
+}
+
+[data-theme="dark"] .hljs-title,
+[data-theme="dark"] .hljs-section,
+[data-theme="dark"] .hljs-title.function_ {
+  color: #60a5fa; /* Crisp Azure */
+  font-weight: 600;
+}
+[data-theme="light"] .hljs-title,
+[data-theme="light"] .hljs-section,
+[data-theme="light"] .hljs-title.function_ {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .hljs-type,
+[data-theme="dark"] .hljs-title.class_,
+[data-theme="dark"] .hljs-attribute {
+  color: #38bdf8; /* Clean Sky Cyan */
+}
+[data-theme="light"] .hljs-type,
+[data-theme="light"] .hljs-title.class_,
+[data-theme="light"] .hljs-attribute {
+  color: #0284c7;
+}
+
+[data-theme="dark"] .hljs-number,
+[data-theme="dark"] .hljs-literal,
+[data-theme="dark"] .hljs-template-variable {
+  color: #fcd34d; /* Warm Amber Gold */
+}
+[data-theme="light"] .hljs-number,
+[data-theme="light"] .hljs-literal,
+[data-theme="light"] .hljs-template-variable {
+  color: #d97706;
+}
+
+.hljs-comment,
+.hljs-quote,
+.hljs-meta {
+  color: #64748b !important; /* Muted Slate */
+  font-style: italic;
+}
+
+[data-theme="dark"] .hljs-variable,
+[data-theme="dark"] .hljs-params {
+  color: #e2e8f0;
+}
+[data-theme="light"] .hljs-variable,
+[data-theme="light"] .hljs-params {
+  color: #1e293b;
+}
+
+/* ── KaTeX Display Math: High-Definition Mathematical Typesetting ─────────── */
+.katex {
+  font-size: 1.12em;
+  text-rendering: auto;
+}
+
+.katex-display {
+  margin: 1.75rem 0 !important;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 1.25rem 1.75rem !important;
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  text-align: center;
+}
+
+.katex-display > .katex {
+  display: inline-block;
+  white-space: nowrap;
+  text-align: center;
+  padding: 4px 0;
+}
